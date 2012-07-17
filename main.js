@@ -1,6 +1,8 @@
 
 var fs = require('fs')
   , root = '/kvdb'
+
+module.exports = FileKVDB;
   
 exports.version = '0.0.1';
 
@@ -8,7 +10,7 @@ export.init = function( aRoot ) {
 	root = aRoot;
 }
 
-export.set = function( K, V ) {
+export.setAsync = function( K, V ) {
 	var fn = root+'/'+K;
 	fs.writeFile(fn,V,function(err) {
 		if( err ) {
@@ -18,6 +20,11 @@ export.set = function( K, V ) {
 		else
 			console.log('set key '+K);
 		});
+	}
+
+export.set = function( K, V ) {
+	var fn = root+'/'+K;
+	fs.writeFileSync(fn,V);
 	}
 	
 export.get = function( K ) {
@@ -31,7 +38,7 @@ export.list = function() {
 	return keys;
 }
 
-export.del = function(K) {
+export.delAsync = function(K) {
 	var fn = root+'/'+K;
 	fs.unlinkFile(fn,function(err) {
 		if( err ) {
@@ -41,5 +48,10 @@ export.del = function(K) {
 		else
 			console.log('del key '+K);
 		});
+	}
+
+export.del = function(K) {
+	var fn = root+'/'+K;
+	fs.unlinkFile(fn);
 	}
 	
