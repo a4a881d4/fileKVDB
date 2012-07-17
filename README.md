@@ -22,3 +22,5 @@
 `kv.set(K,V);`    
 `V=kv.get(K);`    
 `keys=kv.list();`   
+`kv.del(K);`   
+
