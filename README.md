@@ -17,7 +17,7 @@
 
 ## javascript 调用接口
  
-`kv=require('fileKVDB');`    
+`kv=require('FileKVDB');`    
 `kv.init('/kvdb');`    
 `kv.set(K,V);`    
 `V=kv.get(K);`    
