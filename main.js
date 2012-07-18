@@ -5,7 +5,23 @@ exports.version = '0.0.1';
 
 exports.init = function( aRoot ) {
 	root = aRoot;
-	console.log('DB root :'+root);
+	fs.exists(root, function (ex) {
+        if (!ex) {
+        	console.log('DB Root does not exist');
+        	throw ex;
+        }
+        else 
+        	fs.stat( root, function (err, stat) {
+            	if (err) 
+            		throw err;
+            	else {
+                	if( stat.isDirectory() )
+                		console.log('DB root :'+root);
+                	else
+                		console.log('DB root :'+root+' invaild');
+                }
+            });
+	});
 }
 
 exports.setAsync = function( K, V ) {
@@ -39,21 +55,9 @@ exports.list = function() {
 	return keys;
 }
 
-exports.delAsync = function(K) {
-	var fn = root+'/'+K;
-	fs.unlinkFile(fn,function(err) {
-		if( err ) {
-			console.log('fail del key '+K);
-			throw err;
-		}
-		else
-			console.log('del key '+K);
-		});
-	}
-
 exports.del = function(K) {
 	var fn = root+'/'+K;
-	fs.unlinkFile(fn);
+	fs.unlinkSync(fn);
 	}
 
 exports.fn = function(K) {
