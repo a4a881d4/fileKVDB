@@ -2,7 +2,7 @@ var test = require('tap').test;
 var fs = require('fs');
 var kv = require('../main.js');
 
-test('set', function (t) {
+test('setAsync', function (t) {
     t.plan(2);
     var x = Math.floor(Math.random() * Math.pow(16,4)).toString(16);
     var y = Math.floor(Math.random() * Math.pow(16,4)).toString(16);
@@ -10,7 +10,7 @@ test('set', function (t) {
     kv.init('../../../kvdb');
     var K = [x,y,z].join('_');
     var V = 'Hello World';
-    kv.set(K,V);
+    kv.setAsync(K,V);
     fs.exists(kv.fn(K), function (ex) {
         if (!ex) t.fail('K not created')
         else fs.stat(kv.fn(K), function (err, stat) {
@@ -22,7 +22,4 @@ test('set', function (t) {
             }
         })
     })
-	K='a/b/c';
-	V='abc';
-	kv.set(K,V);
 });
