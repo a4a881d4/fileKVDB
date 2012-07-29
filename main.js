@@ -9,8 +9,7 @@ exports.init = function( aRoot ) {
 }
 
 exports.setAsync = function( K, V ) {
-	var fn = root+'/'+K;
-	fs.writeFile(fn,V,function(err) {
+	fs.writeFile(fn(K),V,function(err) {
 		if( err ) {
 			console.log('fail set key '+K);
 			throw err;
@@ -21,16 +20,12 @@ exports.setAsync = function( K, V ) {
 	}
 
 exports.set = function( K, V ) {
-	var fn = root+'/'+K;
-
-	var err = fs.writeFileSync(fn,V);
-
+	var err = fs.writeFileSync(fn(K),V);
 	console.log(err+' '+K+' '+V+' '+fn);
 	}
 	
 exports.get = function( K ) {
-	var fn = root+'/'+K;
-	V = fs.readFileSync(fn);
+	V = fs.readFileSync(fn(K));
 	return V;
 	}
 	
@@ -40,8 +35,7 @@ exports.list = function() {
 }
 
 exports.delAsync = function(K) {
-	var fn = root+'/'+K;
-	fs.unlinkFile(fn,function(err) {
+	fs.unlinkFile(fn(K),function(err) {
 		if( err ) {
 			console.log('fail del key '+K);
 			throw err;
@@ -52,11 +46,11 @@ exports.delAsync = function(K) {
 	}
 
 exports.del = function(K) {
-	var fn = root+'/'+K;
-	fs.unlinkFile(fn);
+	fs.unlinkFile(fn(K));
 	}
 
 exports.fn = function(K) {
+	K.replace(/\//g,'');
 	var fn = root+'/'+K;
 	return fn;
 }	
