@@ -3,7 +3,11 @@ var fs = require('fs');
 var kv = require('../main.js');
 
 test('get', function (t) {
-   	kv.init('../../../kvdb');
+    kv.root('../../../kvdb');
+    kv.newDB('forTest');
+    kv.DB('forTest');
+    kv.newTable('Test');
+    kv.Table('Test');
     var keys = kv.list();
     var V = kv.get(keys[0]);
     t.equal(V.toString(), "Hello World");

@@ -3,7 +3,11 @@ var fs = require('fs');
 var kv = require('../main.js');
 
 test('list', function (t) {
-   	kv.init('../../../kvdb');
+    kv.root('../../../kvdb');
+    kv.newDB('forTest');
+    kv.DB('forTest');
+    kv.newTable('Test');
+    kv.Table('Test');
     var keys = kv.list();
     for( k in keys )
     {

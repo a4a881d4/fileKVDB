@@ -7,7 +7,11 @@ test('setAsync', function (t) {
     var x = Math.floor(Math.random() * Math.pow(16,4)).toString(16);
     var y = Math.floor(Math.random() * Math.pow(16,4)).toString(16);
     var z = Math.floor(Math.random() * Math.pow(16,4)).toString(16);
-    kv.init('../../../kvdb');
+    kv.root('../../../kvdb');
+    kv.newDB('forTest');
+    kv.DB('forTest');
+    kv.newTable('Test');
+    kv.Table('Test');
     var K = [x,y,z].join('_');
     var V = 'Hello World';
     kv.setAsync(K,V);

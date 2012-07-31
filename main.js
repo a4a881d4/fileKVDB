@@ -1,48 +1,126 @@
+
+/*!
+ * FileKVDB
+ * Copyright(c) 2012 a4a881d4 <a4a881d4@163.com>
+ * MIT Licensed
+ */
+
+/**
+ * DB prefix is DB_
+ * Table Prefix is T_
+ * Key Prefix is K_
+ */
 var fs = require('fs')
-	, dbPath = [ 'kvdb', 'DB', 'Table' ]
-	, dbPathName = [ 'DB->root', 'DB->DB', 'DB->Table' ]
+	, dbPath = [ 'kvdb', 'DB', 'Table', 'Item' ]
+	, dbPathName = [ 'DB->root:', 'DB->DB:', 'DB->Table:', 'DB->item:' ]
+	, dbPrefix = ['', 'DB_', 'T_', 'K_' ]
 
-Exports.version = '0.0.3';
+/**
+ * version.
+ */
+exports.version = '0.0.3';
 
-exports.fn = function(K) {
-	return fn(K);
-}
-	
+/**
+ * internal file or dir check.
+ *
+ * @param {Key} ...
+ * @return {Key without `\`}
+ * @utility function
+ */
 validK = function(K) {
-	return K.replace(new RegExp('\/',"gm"),'');
+	if( K !== undefined )
+		return K.replace(new RegExp('\/',"gm"),'');
+	else
+	{
+		console.error('may be a null key');
+		return K;
+	}
 }
 
-fn = function(K) {
+/**
+ * internal/export build filename.
+ *
+ * @param {Key} ...
+ * @return {DB file system file name}
+ * @utility function
+ */
+exports.fn = fn = function(K) {
 	K = validK(K);
-	var fn = joinPath(3)+'/'+K;
+	var fn = joinPathWithPrefix(3)+K;
 	return fn;
 }
 
+/**
+ * Export set get DB root.
+ *
+ * @param {DB root path} ...
+ * @return {if no param return current root}
+ */
 exports.root = function( aRoot ) {
 	return DBPath( 0, aRoot );
 }
 
-exports.DB = function( DB ) {
+/**
+ * Export set get current DB .
+ *
+ * @param {DB name} ...
+ * @return {if no param return current DB}
+ */
+exports.DB = setDB = function( DB ) {
 	return DBPath( 1, DB );
 }
 
-exports.Table = function( Table ) {
+/**
+ * Export set get current Table .
+ *
+ * @param {Table name} ...
+ * @return {if no param return current Table}
+ */
+exports.Table = setTable = function( Table ) {
 	return DBPath( 2, Table );
 }
 
+/**
+ * internal build path.
+ *
+ * @param {level 0:root 1:DB 2:table } ...
+ * @return {DB file system path}
+ * @utility function
+ */
 joinPath = function( level ) {
-	var str = "";
+	var str = '';
 	for( var i=0;i<level;i++ ) {
 		str += dbPath[i]+'/';
 	}
+	return str;
 }
 
+joinPathWithPrefix = function( level ) {
+	return joinPath( level ) + dbPrefix[level];
+}
+/**
+ * internal get set path.
+ *
+ * @param {level 0:root 1:DB 2:table } ...
+ * @return {if no second param return current name}
+ * @utility function
+ */
 DBPath = function( level, mypath ) {
 	if( mypath !== undefined ) {
-		var aRoot = joinPath(level) + mypath;
+		var aRoot = joinPathWithPrefix(level);
+		if( level==0 )
+		{
+			aRoot += mypath;
+			dbPath[0] = mypath;
+		}
+		else
+		{
+			aRoot += validK(mypath);
+			dbPath[level] = dbPrefix[level]+validK(mypath);
+		}		
 		fs.exists(aRoot, function (ex) {
 			if (!ex) {
-				console.log(dbPathName[level]+': not exist ');
+				console.log(dbPathName[level]+': not exist ('+aRoot+')');
 				console.error(ex);
 			}
       else 
@@ -51,50 +129,78 @@ DBPath = function( level, mypath ) {
 						console.error( err );
 					else {
 						if( stat.isDirectory() ) {
-							if( level !=0 )
-								dbPath[level] = validK(myPath);
-							else
-								dbPath[level] = myPath;
-							console.log(dbPathName[level]+myPath);
+							console.log(dbPathName[level]+dbPath[level]);
 						}
 						else
-							console.error(dbPathName[level]+myPath+' invaild');
+							console.error(dbPathName[level]+mypath+' invaild');
 	        }
 				});
 		});
 	}
 	else {
-		return dbPath[level];
+		return realName( dbPath[level], level );
 	}
 }
 
+realName = function( str, level ) {
+	var inx = str.indexOf('_');
+	if( level==0 )
+		return str;
+	else
+		return str.substring(inx+1);		
+}
+
+/**
+ * internal make dir->DB or table.
+ *
+ * @param {level 1:DB 2:table } ...
+ * @return {if no second param return current name}
+ * @utility function
+ */
 newDir = function( level, dir ) {
-	var aRoot = joinPath(level) + dir;
+	var aRoot = joinPathWithPrefix(level) + dir;
 	var mkdirp = require('mkdirp');
-	mkdirp( aRoot, function(err) {
-		if (err) 
-			console.error(err);
-	});
+	mkdirp.sync( aRoot );
 }	
 
+/**
+ * Export new DB .
+ * if DB exist do nothing
+ * @param {DB name} ...
+ * @return none
+ */
 exports.newDB = function( DB ) {
 	newDir( 1, DB );
 }
 
+/**
+ * Export new Table .
+ * if Table exist do nothing
+ * @param {DB name} ...
+ * @return none
+ */
 exports.newTable = function( table ) {
 	newDir( 2, table );
 }
 
-hasDir = function(level,'DB',fn) {
-	var aRoot = DBPath(level)+DB;
+/**
+ * internal check dir exist.
+ *
+ * @param {level 1:DB 2:table } ...
+ * @return {if no second param return current name}
+ * @utility function
+ */
+hasDir = function( level,dir,fn ) {
+	var aRoot = joinPathWithPrefix(level)+dir;
 	fs.exists(aRoot, function (ex) {
 		if (!ex) {
 			fn(false);
+			console.error('not this file/dir:'+aRoot);
 		}
-		else 
+		else {
 			fs.stat( aRoot, function (err, stat) {
 					if (err) {
-						console.error( err );
+						console.error( err + 'else no use');
 						fn(false);
 					}
 					else {
@@ -105,18 +211,133 @@ hasDir = function(level,'DB',fn) {
 							fn(false);
 	        }
 				});
+			}
 	});
-};
+}
 
-
-exports.hasDB(DB,fn) {
+/**
+ * Export check DB exist .
+ *
+ * @param {DB name, fn callback} ...
+ * @return none
+ */
+exports.hasDB = function(DB,fn) {
 	hasDir(1,DB,fn);
 }
 
-exports.hasTable(table,fn) {
+/**
+ * Export check table exist .
+ *
+ * @param {DB name, fn callback} ...
+ * @return none
+ */
+exports.hasTable = function(table,fn) {
 	hasDir(2,table,fn);
 }
 
+/**
+ * Export get whole DB structure .
+ *
+ * @param {} ...
+ * @return object
+ */
+exports.Tree = function () {
+	var aRoot = joinPath(1);
+	var DBs = fs.readdirSync(aRoot);
+	var ret = {};
+	for( var i in DBs ) {
+		tables = fs.readdirSync(aRoot+'/'+DBs[i]);
+		for( var j in tables )
+			tables[j] = realName( tables[j], 2 ); 
+		ret[realName(DBs[i],1)] = tables;
+	}
+	return ret;
+}
+
+exports.backup = function( task ) {
+	var dir = joinPathWithPrefix(1);
+	dir += task['DB'];
+	if( task['Table'] !== undefined ) {
+		dir += '/'+dbPrefix[2]+task['Table'];
+	}
+	var fileName = dir+'.tar.gz';
+	var fstream = require('fstream');
+	var tar = require('tar');
+	var zlib = require('zlib');
+	console.log("tar gzipping " + dir + " -> " + fileName);
+	fstream.Reader({path: dir, type: 'Directory'})
+		.pipe(tar.Pack())  
+		.pipe(zlib.createGzip())  
+		.pipe(fstream.Writer(fileName));
+}
+
+exports.restore = function( task ) {
+	var dir = joinPathWithPrefix(1);
+	dir += task['DB'];
+	if( task['Table'] !== undefined ) {
+		dir += '/'+dbPrefix[2]+task['Table'];
+	}
+	var fileName = dir+'.tar.gz';
+	dir = joinPath(1);
+	if( task['Table'] !== undefined ) {
+		dir += task['DB'];
+	}
+	var fstream = require('fstream');
+	var tar = require('tar');
+	var zlib = require('zlib');
+	console.log( "tar ungzipping " + fileName + " -> " + dir );
+	fstream.Reader(fileName)
+		.pipe(zlib.createGunzip())  
+		.pipe(tar.Extract({path: dir}));
+}
+
+exports.clearTable = clearTable =function( Table, DB ) {
+	var backDBPath = dbPath.slice(0);
+	if( DB !== undefined ) {
+		setDB(DB);
+	}
+	setTable(Table);
+	var Keys = itemList();
+	for( var i in Keys )
+		internalDelAsync(Keys[i]);
+	dbPath = backDBPath.slice(0);
+}
+
+exports.delTable = delTable = function(Table, DB ) {
+	var backDBPath = dbPath.slice(0);
+	setDB(DB);
+	setTable(Table);
+	clearTable(Table,DB);
+	if( DB !== undefined ) {
+		dbPath[1] = dbPrefix[1]+DB;
+	}
+	var dir = joinPathWithPrefix(2)+Table;
+	fs.rmdirSync(dir);
+	dbPath = backDBPath.slice(0);
+}
+ 
+exports.clearDB = clearDB = function(DB) {
+	var backDBPath = dbPath.slice(0);
+	setDB(DB);
+	var tables = tabelList();
+	for( var i in tables ) 
+		delTable( tables[i], DB );
+	clearBackup(2);
+	dbPath = backDBPath.slice(0);
+}	
+
+exports.delDB = delDB = function(DB) {
+	var backDBPath = dbPath.slice(0);
+	setDB(DB);
+	var tables = tabelList();
+	console.log(JSON.stringify(tables));
+	for( var i in tables ) 
+		delTable( tables[i], DB );
+	clearBackup(2);
+	var dir = joinPathWithPrefix(1)+DB;
+	fs.rmdirSync(dir);
+	dbPath = backDBPath.slice(0);
+}
 
 exports.setAsync = function( K, V ) {
 	fs.writeFile(fn(K),V,function(err) {
@@ -127,23 +348,66 @@ exports.setAsync = function( K, V ) {
 		else
 			console.log('set key '+K);
 		});
-	}
+}
 
 exports.set = function( K, V ) {
 	var err = fs.writeFileSync(fn(K),V);
 }
 	
 exports.get = function( K ) {
-	V = fs.readFileSync(fn(K));
-	return V;
+	var V = fs.readFileSync(fn(K));
+	return V.toString();
 	}
-	
-exports.list = function() {
-	keys = fs.readdirSync(root);
-	return keys;
+
+internalList = function( level ) {
+	var dir = joinPath(level);
+	var keys = fs.readdirSync(dir);
+	var j = 0;
+	var ret = [];
+	for( var k in keys ) {
+		var name = realName( keys[k], 3 );
+		if( name.indexOf('.tar.gz')==-1 ) {
+			ret[j]=name;
+			j++;
+		}
+	}
+	return ret;	
 }
 
-exports.delAsync = function(K) {
+clearBackup = function( level ) {
+	var dir = joinPath(level);
+	var keys = fs.readdirSync(dir);
+	for( var k in keys ) {
+		if( keys[k].indexOf('.tar.gz')!=-1 ) {
+			fs.unlinkSync(dir+keys[k]);		
+		}
+	}
+}
+
+exports.clearTableBackup = function( DB ) {
+	var backDBPath = dbPath.slice(0);
+	setDB(DB);
+	clearBackup(2);
+	dbPath = backDBPath.slice(0);
+}
+
+exports.clearDBBackup = function() {
+	clearBackup(1);
+}
+
+exports.list = itemList = function() {
+	return internalList(3);
+}
+
+exports.listTable = tabelList = function() {
+	return internalList(2);
+}
+
+exports.listDB = dbList = function() {
+	return internalList(1);
+}
+
+exports.delAsync = internalDelAsync = function(K) {
 	fs.unlink(fn(K),function(err) {
 		if( err ) {
 			console.error('fail del key '+K);

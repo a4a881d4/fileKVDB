@@ -13,6 +13,11 @@
     "type": "git",
     "url": "https://github.com/a4a881d4/fileKVDB.git"
   },
+	"dependencies": {
+    "mkdirp": "~0.3.3",
+    "tar": "~0.1.12",
+    "fstream": "~0.1.17"
+	},
   "keywords": [
     "db"
   ],
