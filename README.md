@@ -44,6 +44,8 @@
 `kv.clear()`  
 `kv.clearDB('DB')`  
 `kv.clearTable('table')`  
+`kv.clearTable('table','DB')`   
+
 
 
 
