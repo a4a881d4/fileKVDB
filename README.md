@@ -33,9 +33,10 @@
 `root = kv.root()`  
 `DB = kv.DB()`  
 `Tab = kv.Table()`  
-`kv.hasDB('DB')`  
-`kv.hasTable('tabel')`  
-`DB = kv.find('table')`  
+`kv.hasDB('DB',function(ret) { if(ret==true) do some has DB })`  
+`kv.hasTable('tabel', function(ret) { if(ret==true) do some has table })`  
+`DBs = kv.find('table')`
+`Tree = kv.Tree()`
 ### ±¸·Ý\»Ö¸´\Çå³ý
 `kv.backup({'DB':'myDB','Table':'myTable'})`  
 `kv.backup({'DB':'myDB'})`  

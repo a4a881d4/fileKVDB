@@ -1,6 +1,6 @@
 var fs = require('fs')
-	, dbPath = { 'kvdb', 'DB', 'Table' }
-	, dbPathName = { 'DB->root', 'DB->DB', 'DB->Table' }
+	, dbPath = [ 'kvdb', 'DB', 'Table' ]
+	, dbPathName = [ 'DB->root', 'DB->DB', 'DB->Table' ]
 
 Exports.version = '0.0.3';
 
@@ -43,12 +43,12 @@ DBPath = function( level, mypath ) {
 		fs.exists(aRoot, function (ex) {
 			if (!ex) {
 				console.log(dbPathName[level]+': not exist ');
-				throw ex;
+				console.error(ex);
 			}
       else 
 				fs.stat( aRoot, function (err, stat) {
 					if (err) 
-						throw err;
+						console.error( err );
 					else {
 						if( stat.isDirectory() ) {
 							if( level !=0 )
@@ -58,7 +58,7 @@ DBPath = function( level, mypath ) {
 							console.log(dbPathName[level]+myPath);
 						}
 						else
-							console.log(dbPathName[level]+myPath+' invaild');
+							console.error(dbPathName[level]+myPath+' invaild');
 	        }
 				});
 		});
@@ -68,11 +68,61 @@ DBPath = function( level, mypath ) {
 	}
 }
 
-Exports.setAsync = function( K, V ) {
+newDir = function( level, dir ) {
+	var aRoot = joinPath(level) + dir;
+	var mkdirp = require('mkdirp');
+	mkdirp( aRoot, function(err) {
+		if (err) 
+			console.error(err);
+	});
+}	
+
+exports.newDB = function( DB ) {
+	newDir( 1, DB );
+}
+
+exports.newTable = function( table ) {
+	newDir( 2, table );
+}
+
+hasDir = function(level,'DB',fn) {
+	var aRoot = DBPath(level)+DB;
+	fs.exists(aRoot, function (ex) {
+		if (!ex) {
+			fn(false);
+		}
+		else 
+			fs.stat( aRoot, function (err, stat) {
+					if (err) {
+						console.error( err );
+						fn(false);
+					}
+					else {
+						if( stat.isDirectory() ) {
+							fn(true);
+						}
+						else
+							fn(false);
+	        }
+				});
+	});
+};
+
+
+exports.hasDB(DB,fn) {
+	hasDir(1,DB,fn);
+}
+
+exports.hasTable(table,fn) {
+	hasDir(2,table,fn);
+}
+
+
+exports.setAsync = function( K, V ) {
 	fs.writeFile(fn(K),V,function(err) {
 		if( err ) {
 			console.log('fail set key '+K);
-			throw err;
+			console.log(err);
 		}
 		else
 			console.log('set key '+K);
@@ -96,8 +146,8 @@ exports.list = function() {
 exports.delAsync = function(K) {
 	fs.unlink(fn(K),function(err) {
 		if( err ) {
-			console.log('fail del key '+K);
-			throw err;
+			console.error('fail del key '+K);
+			console.error(err);
 		}
 		else
 			console.log('del key '+K);
