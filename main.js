@@ -1,39 +1,74 @@
 var fs = require('fs')
-	, root = '/kvdb'
+	, dbPath = { 'kvdb', 'DB', 'Table' }
+	, dbPathName = { 'DB->root', 'DB->DB', 'DB->Table' }
 
-exports.version = '0.0.1';
+Exports.version = '0.0.3';
 
 exports.fn = function(K) {
 	return fn(K);
-}	
+}
+	
+validK = function(K) {
+	return K.replace(new RegExp('\/',"gm"),'');
+}
 
 fn = function(K) {
-	K=K.replace(new RegExp('\/',"gm"),'');
-	var fn = root+'/'+K;
+	K = validK(K);
+	var fn = joinPath(3)+'/'+K;
 	return fn;
 }
-exports.init = function( aRoot ) {
-	root = aRoot;
-	fs.exists(root, function (ex) {
-        if (!ex) {
-        	console.log('DB Root does not exist');
-        	throw ex;
-        }
-        else 
-        	fs.stat( root, function (err, stat) {
-            	if (err) 
-            		throw err;
-            	else {
-                	if( stat.isDirectory() )
-                		console.log('DB root :'+root);
-                	else
-                		console.log('DB root :'+root+' invaild');
-                }
-            });
-	});
+
+exports.root = function( aRoot ) {
+	return DBPath( 0, aRoot );
 }
 
-exports.setAsync = function( K, V ) {
+exports.DB = function( DB ) {
+	return DBPath( 1, DB );
+}
+
+exports.Table = function( Table ) {
+	return DBPath( 2, Table );
+}
+
+joinPath = function( level ) {
+	var str = "";
+	for( var i=0;i<level;i++ ) {
+		str += dbPath[i]+'/';
+	}
+}
+
+DBPath = function( level, mypath ) {
+	if( mypath !== undefined ) {
+		var aRoot = joinPath(level) + mypath;
+		fs.exists(aRoot, function (ex) {
+			if (!ex) {
+				console.log(dbPathName[level]+': not exist ');
+				throw ex;
+			}
+      else 
+				fs.stat( aRoot, function (err, stat) {
+					if (err) 
+						throw err;
+					else {
+						if( stat.isDirectory() ) {
+							if( level !=0 )
+								dbPath[level] = validK(myPath);
+							else
+								dbPath[level] = myPath;
+							console.log(dbPathName[level]+myPath);
+						}
+						else
+							console.log(dbPathName[level]+myPath+' invaild');
+	        }
+				});
+		});
+	}
+	else {
+		return dbPath[level];
+	}
+}
+
+Exports.setAsync = function( K, V ) {
 	fs.writeFile(fn(K),V,function(err) {
 		if( err ) {
 			console.log('fail set key '+K);
@@ -46,8 +81,7 @@ exports.setAsync = function( K, V ) {
 
 exports.set = function( K, V ) {
 	var err = fs.writeFileSync(fn(K),V);
-	console.log(err+' '+K+' '+V+' '+fn);
-	}
+}
 	
 exports.get = function( K ) {
 	V = fs.readFileSync(fn(K));

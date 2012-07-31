@@ -16,11 +16,33 @@
 数据库的项数受一个目录下最大文件数目限制。
 
 ## javascript 调用接口
- 
-`kv=require('filekvdb');`    
-`kv.init('/kvdb');`    
+### 基本使用 
+`kv=require('filekvdb');`
+`kv.root('/kvdb')`
+`kv.DB('myDB')`
+`kv.Table('USER')`
 `kv.set(K,V);`    
 `V=kv.get(K);`    
 `keys=kv.list();`   
-`kv.del(K);`   
+`kv.del(K);` 
+### 新建DB和表
+`kv.newDB('yourDB')`
+`kv.DB('yourDB')`
+`kv.newTable('yourTable')`
+### 查询
+`root = kv.root()`
+`DB = kv.DB()`
+`Tab = kv.Table()`
+`kv.hasDB('DB')`
+`kv.hasTable('tabel')`
+`DB = kv.find('table')`
+### 备份\恢复\清除
+`kv.backup({'DB':'myDB','Table':'myTable'})`
+`kv.backup({'DB':'myDB'})`
+`kv.restore({'DB':'myDB','Table':'myTable'})`
+`kv.restore({'DB':'myDB'})`
+`kv.clear()`
+`kv.clearDB('DB')`
+`kv.clearTable('table')`
+
 
