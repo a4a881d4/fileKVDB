@@ -34,18 +34,16 @@
 `DB = kv.DB()`  
 `Tab = kv.Table()`  
 `kv.hasDB('DB',function(ret) { if(ret==true) do some has DB })`  
-`kv.hasTable('tabel', function(ret) { if(ret==true) do some has table })`  
+`kv.hasTable('tabel', function(ret) { if(ret==true) do some has table })` 
+`kv.has(K, function(ret) { if(ret==true) do some if K exist })` 
+`kv.has(K) //if K exist return true`   
 `Tree = kv.Tree()`
 ### ±¸·Ý\»Ö¸´\Çå³ý
 `kv.backup({'DB':'myDB','Table':'myTable'})`  
 `kv.backup({'DB':'myDB'})`  
 `kv.restore({'DB':'myDB','Table':'myTable'})`  
 `kv.restore({'DB':'myDB'})`  
-`kv.clear()`  
 `kv.clearDB('DB')`  
 `kv.clearTable('table')`  
 `kv.clearTable('table','DB')`   
-
-
-
 

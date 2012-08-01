@@ -18,7 +18,7 @@ var fs = require('fs')
 /**
  * version.
  */
-exports.version = '0.0.3';
+exports.version = '0.0.4';
 
 /**
  * internal file or dir check.
@@ -246,10 +246,18 @@ exports.Tree = function () {
 	var DBs = fs.readdirSync(aRoot);
 	var ret = {};
 	for( var i in DBs ) {
-		tables = fs.readdirSync(aRoot+'/'+DBs[i]);
-		for( var j in tables )
-			tables[j] = realName( tables[j], 2 ); 
-		ret[realName(DBs[i],1)] = tables;
+		if( DBs[i].indexOf('.tar.gz')==-1 ) {
+			tables = fs.readdirSync(aRoot+'/'+DBs[i]);
+			var m = 0;
+			var minT = [];
+			for( var j in tables ) {
+				if( tables[j].toString().indexOf('.tar.gz')==-1 ) {
+					minT[m] = realName( tables[j], 2 ); 
+					m++;
+				}
+			}
+			ret[realName(DBs[i],1)] = minT;
+		}
 	}
 	return ret;
 }
@@ -422,6 +430,31 @@ exports.del = function(K) {
 	fs.unlink(fn(K));
 }
 
+exports.has = function( K, callbackF ) {
+	if( callbackF === undefined )
+		return fs.existsSync(fn(K));
+	else {
+		fs.exists( fn(K), function(ex) {
+			if(!ex)
+				callbackF(false);
+			else {
+				fs.stat( fn(K), function (err, stat) {
+					if (err) {
+						console.error( err + 'else no use');
+						callbackF(false);
+					}
+					else {
+						if( stat.isFile() ) {
+							callbackF(true);
+						}
+						else
+							callbackF(false);
+	        }
+				});
+			}
+		});
+	}
+}
 
 
 

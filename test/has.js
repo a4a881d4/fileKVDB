@@ -35,5 +35,14 @@ test('has', function (t) {
     t.equal( kv.root(), '../../../kvdb' );
     var ret = kv.Tree();
     console.log(JSON.stringify(ret));
+    kv.set('abc','efg');
+    t.equal( kv.has('abc'), true );
+    t.equal( kv.has('efg'),false );
+    kv.has('abc',function(ret) {
+    	t.equal(ret,true);
+    });
+    kv.has('efg',function(ret) {
+    	t.equal(ret,false);
+    });
     t.end();
 });
