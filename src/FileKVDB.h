@@ -15,12 +15,14 @@ class FileKVDB {
 		string realName ( string str, int level );
 		void newDir( int level, string dir );
 		void hasDir( int level, string dir );
-		string[] internalList( level );
-		void clearBackup( int level );
+		vector<string> internalList( level );
+		void clearBackup( string dir );
+		vector<string>* dirAdir( string dir );
+
 	public:
 		FileKVDB( string root );
 		const string version = "0.0.4";
-		string fn( string k );
+		string fn( string k ){	return joinPathwithPrefix(3)+validK(k);};
 		void root( string aRoot ) {return DBPath( 0, aRoot );};
 		string root() { return DBPath(0); };
 		void DB( string db ) { return setDB(db); };
@@ -31,17 +33,16 @@ class FileKVDB {
 		void newTable( string table ) {	newDir( 2, table );};
 		bool hasDB(string db) {	return hasDir(1,DB); };
 		bool hasTable(string table) { return hasDir(2,table); };
-		string Tree();
 		void clearTable( string Table, string db );
 		void delTable( string Table, string db );
 		void clearDB( string db );
+		void clearTableBackup( string db ) {clearBackup(dbPath[0]+'/'+dbPrefix[1]+db+'/');};
+		void clearDBBackup() {clearBackup(dbPath[0]+'/');};
+		vector<string> list() {return internalList(3);};
+		vector<string> listTable() {return internalList(2);};
+		vector<string> listDB() {	return internalList(1); };
 		void set( string K, string V );
 		string get( string K );
-		void clearTableBackup( string db ) {clearBackup(2);};
-		void clearDBBackup() {clearBackup(1);};
-		string[] list() {return internalList(3);};
-		string[] listTablefunction() {return internalList(2);};
-		string[] listDB() {	return internalList(1); };
 		void del( string K );
 		bool has( string K );
 };

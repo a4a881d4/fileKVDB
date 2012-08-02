@@ -1,56 +1,155 @@
+#include <sys/types.h>
+#include <dirent.h>
+#include <errno.h>
+#include <vector>
+#include <string>
+#include <iostream>
+#include 'FileKVDB.h'
+
 string FileKVDB::validK(string K)
 {
-	return K.replace("/\//g","");
+	while(1) {
+		int pos = K.find('/');
+		if( pos!= K.npos ) {
+			K=K.subst(0,pos-1)+subst(pos+1);
+		}
+		else
+			break;
+	}
+	return K;
 }
 string FileKVDB::joinPath( int level )
 {
 	string str = "";
 	for( int i=0;i<level;i++ ) {
-		str += dbPath[i]+"/";
+		str.append(dbPath[i]+'/');
 	}
 	return str;
 }
-string[] internalList( level )
+vector<string>& internalList( level )
 {
 	string dir = joinPath(level);
-	string[] keys = fs.readdirSync(dir);
-	var j = 0;
-	string[] ret;
-	for( var k in keys ) {
-		var name = realName( keys[k], 3 );
-		if( name.indexOf('.tar.gz')==-1 ) {
-			ret[j]=name;
-			j++;
+	vector<string>* files = dirAdir( dir );
+    vector<string> *ret = new vector<string>;
+	for( int k=0;k<files->size;k++ ) {
+		var name = realName( (*files)[k], 3 );
+		if( name.find('.tar.gz')==name.npos ) {
+			ret->push_back(name);
 		}
 	}
-	return ret;	
+	delete files;
+	return *ret;	
 }
-void clearBackup( int level );
-	public:
-		FileKVDB( string root );
-		const string version = "0.0.4";
-		string fn( string k );
-		void root( string aRoot ) {return DBPath( 0, aRoot );};
-		string root() { return DBPath(0); };
-		void DB( string db ) { return setDB(db); };
-		string DB() { return setDB(); };
-		void Table( string table ) {return setTable( table );}; 
-		string Table() { return setTable(); };
-		void newDB( string db ) { newDir( 1, db ); };
-		void newTable( string table ) {	newDir( 2, table );};
-		bool hasDB(string db) {	return hasDir(1,DB); };
-		bool hasTable(string table) { return hasDir(2,table); };
-		string Tree();
-		void clearTable( string Table, string db );
-		void delTable( string Table, string db );
-		void clearDB( string db );
-		void set( string K, string V );
-		string get( string K );
-		void clearTableBackup( string db ) {clearBackup(2);};
-		void clearDBBackup() {clearBackup(1);};
-		string[] list() {return internalList(3);};
-		string[] listTablefunction() {return internalList(2);};
-		string[] listDB() {	return internalList(1); };
-		void del( string K );
-		bool has( string K );
-};
+
+vector<string>* FileKVDB::dirAdir( string dir )
+{
+	vector<string>* files = new vector<string>;
+    DIR *dp;
+    struct dirent *dirp;
+    if((dp  = opendir(dir.c_str())) == NULL) {
+        cout << "Error(" << errno << ") opening " << dir << endl;
+        return errno;
+    }
+
+    while ((dirp = readdir(dp)) != NULL) {
+        files->push_back(string(dirp->d_name));
+    }
+    closedir(dp);
+    return files;
+}
+void FileKVDB::clearBackup( string dir )
+{
+	vector<string> *files = dirAdir( dir );
+	vector<string> *ret = new vector<string>;
+	for( int k=0;k<files->size;k++ ) {
+		var name = realName( (*files)[k], 3 );
+		if( name.find('.tar.gz')!=name.npos ) {
+			remove(dir+(*files)[k]);
+		}
+	}
+	delete files;
+	delete ret;
+}
+
+FileKVDB::FileKVDB( string root )
+{
+	dbPath[0]=root;
+}
+
+string FileKVDB::clearTable( string Table, string db )
+{
+	string dir = dbPath[0]+'/'
+		+ dbPrefix[1]+db+'/'
+		+ dbPrefix[1]+Table+'/';
+	vector<string> *files = dirAdir( dir );
+	for( int i=0;i<files->size;i++ )
+	{
+		remove(dir+(*file)[i]);
+	}
+	delete files;		
+	return dir;
+}
+void FileKVDB::delTable( string Table, string db )
+{
+	string dir = clearTable( Table,db );
+	remove( dir );
+}
+void FileKVDB::clearDB( string db )
+{
+	string backupDB = DB();
+	DB(db);
+	vector<string> tables = listDB();
+	for( int i=0;i<tables.size;i++ )
+	{
+		delTable(tables[i],db);	
+	} 
+	clearTableBackup(db);
+}
+		
+void FileKVDB::set( string K, string V )
+{
+	string filename = fn(K);
+	ofstream out(filename);
+	out<<V;
+	out.close(); 
+}
+string FileKVDB::get( string K )
+{
+	string filename = fn(K);
+	ifstream in(filename);
+	string V = "";
+	in>>V;
+	in.close();
+	return V; 
+}
+
+void FileKVDB::del( string K )
+{
+	string filename = fn(K);
+	remove(filename);
+}
+bool FileKVDB::has( string K )
+{
+	string filename = fn(K);
+	ifstream in(filename);
+	if(in) {
+		in.close();
+		return true;
+	}
+	return false;
+}
+
+bool FileKVDB::hasDir( int level )
+{
+	string dir = joinPath(level);
+	DIR *pDir;
+    bool bExists = false;
+    pDir = opendir (dir);
+    if (pDir != NULL)
+    {
+        bExists = true;    
+        (void) closedir (pDir);
+    }
+
+    return bExists;
+}
