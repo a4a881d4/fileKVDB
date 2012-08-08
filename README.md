@@ -47,3 +47,27 @@
 `kv.clearTable('table')`  
 `kv.clearTable('table','DB')`   
 
+## C++ 调用接口
+### 基本使用 
+`FileKVDB kv("kvdb");`  
+`kv.DB('myDB')`  
+`kv.Table('USER')`  
+`kv.set(K,V);`      
+`string V=kv.get(K);`      
+`vector<string> keys=kv.list();`    
+`kv.del(K);`
+### 新建DB和表
+`kv.newDB("yourDB")`  
+`kv.DB("yourDB")`  
+`kv.newTable("yourTable")`  
+### 查询
+`DB = kv.DB()`  
+`Tab = kv.Table()`  
+`kv.hasDB("DB")`  
+`kv.hasTable("tabel")` 
+`kv.has(K)` 
+### 清除
+`kv.clearDB('DB')`  
+`kv.clearTable('table','DB')`   
+
+
