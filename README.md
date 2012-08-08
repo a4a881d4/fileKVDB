@@ -64,7 +64,7 @@
 `DB = kv.DB()`  
 `Tab = kv.Table()`  
 `kv.hasDB("DB")`  
-`kv.hasTable("tabel")` 
+`kv.hasTable("tabel")`  
 `kv.has(K)` 
 ### Çå³ý
 `kv.clearDB('DB')`  
