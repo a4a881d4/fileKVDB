@@ -3,3 +3,6 @@ npm-debug.log
 *.bak
 *~
 . .. .git .gitconfig
+work/
+kvdb/
+

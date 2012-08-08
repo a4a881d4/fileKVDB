@@ -1,8 +1,10 @@
+#ifndef __FILEKVDB_H
+#define __FILEKVDB_H
 class FileKVDB {
 	private:
 		string dbPath[4];
-		const string dbPathName[] = { "DB->root:", "DB->DB:", "DB->Table:", "DB->item:" };
-		const string dbPrefix[] = {"", "DB_", "T_", "K_" };
+		static string dbPathName[];
+		static string dbPrefix[];
 		string validK(string K);
 		void setDB(string db) {return DBPath(1,db);};
 		string setDB() {return DBPath(1);};
@@ -11,18 +13,18 @@ class FileKVDB {
 		string joinPath( int level );
 		string joinPathWithPrefix( int level ) { return joinPath(level)+dbPrefix[level];};
 		string DBPath( int level ){return realName( dbPath[level], level );};
-		void DBPath( int level, string mypath );
-		string realName ( string str, int level );
+		void DBPath( int level, string mypath ){dbPath[level]=dbPrefix[level]+mypath;};
+		string realName ( string str, int level ){int pos=str.find('_');if(pos!=str.npos) return str.substr(pos+1); else return str;};
 		void newDir( int level, string dir );
-		void hasDir( int level, string dir );
-		vector<string> internalList( level );
+		bool hasDir( int level, string dir );
+		vector<string>& internalList( int level );
 		void clearBackup( string dir );
 		vector<string>* dirAdir( string dir );
 
 	public:
 		FileKVDB( string root );
-		const string version = "0.0.4";
-		string fn( string k ){	return joinPathwithPrefix(3)+validK(k);};
+		static string version;
+		string fn( string k ){	return joinPathWithPrefix(3)+validK(k);};
 		void root( string aRoot ) {return DBPath( 0, aRoot );};
 		string root() { return DBPath(0); };
 		void DB( string db ) { return setDB(db); };
@@ -31,9 +33,9 @@ class FileKVDB {
 		string Table() { return setTable(); };
 		void newDB( string db ) { newDir( 1, db ); };
 		void newTable( string table ) {	newDir( 2, table );};
-		bool hasDB(string db) {	return hasDir(1,DB); };
+		bool hasDB(string db) {	return hasDir(1,db); };
 		bool hasTable(string table) { return hasDir(2,table); };
-		void clearTable( string Table, string db );
+		string clearTable( string Table, string db );
 		void delTable( string Table, string db );
 		void clearDB( string db );
 		void clearTableBackup( string db ) {clearBackup(dbPath[0]+'/'+dbPrefix[1]+db+'/');};
@@ -46,3 +48,4 @@ class FileKVDB {
 		void del( string K );
 		bool has( string K );
 };
+#endif
