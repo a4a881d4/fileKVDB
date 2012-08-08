@@ -70,4 +70,10 @@
 `kv.clearDB('DB')`  
 `kv.clearTable('table','DB')`   
 
+## C++  ≤‚ ‘
+`mkdir work`  
+`make Test`  
+`mkdir kvdb`  
+`work/Test`  
+
 
