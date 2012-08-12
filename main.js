@@ -18,7 +18,7 @@ var fs = require('fs')
 /**
  * version.
  */
-exports.version = '0.0.4';
+exports.version = '0.0.5';
 
 /**
  * internal file or dir check.
@@ -288,7 +288,7 @@ exports.restore = function( task ) {
 	var fileName = dir+'.tar.gz';
 	dir = joinPath(1);
 	if( task['Table'] !== undefined ) {
-		dir += task['DB'];
+		dir += dbPrefix[1]+task['DB'];
 	}
 	var fstream = require('fstream');
 	var tar = require('tar');
@@ -307,7 +307,7 @@ exports.clearTable = clearTable =function( Table, DB ) {
 	setTable(Table);
 	var Keys = itemList();
 	for( var i in Keys )
-		internalDelAsync(Keys[i]);
+		del(Keys[i]);
 	dbPath = backDBPath.slice(0);
 }
 
@@ -426,8 +426,8 @@ exports.delAsync = internalDelAsync = function(K) {
 		});
 	}
 
-exports.del = function(K) {
-	fs.unlink(fn(K));
+exports.del = del = function(K) {
+	fs.unlinkSync(fn(K));
 }
 
 exports.has = function( K, callbackF ) {
@@ -456,5 +456,7 @@ exports.has = function( K, callbackF ) {
 	}
 }
 
-
+exports.setPrefix = function(prefix) {
+	dbPrefix=prefix;
+}
 

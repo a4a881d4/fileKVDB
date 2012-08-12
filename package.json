@@ -1,6 +1,6 @@
 {
   "name": "filekvdb",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "File system based KVDB",
   "main": "main.js",
   "directories": {
