@@ -1,22 +1,23 @@
+[![build status](https://secure.travis-ci.org/a4a881d4/fileKVDB.png)](http://travis-ci.org/a4a881d4/fileKVDB)
 # ***FileKVDB***
-* 文件名为K
-* 文件内容为V
+* 锟侥硷拷锟斤拷为K
+* 锟侥硷拷锟斤拷锟斤拷为V
 
-**FileKVDB是**
-* 小型
-* 超轻量级
-* 基于操作系统文件系统
+**FileKVDB锟斤拷**
+* 小锟斤拷
+* 锟斤拷锟斤拷锟斤拷锟斤拷
+* 锟斤拷锟节诧拷锟斤拷系统锟侥硷拷系统
 * KV
-* 数据库
+* 锟斤拷锟捷匡拷
 
-**FileKVDB不是**
-* 大型的
-* 关系型的
-* 高效的    
-数据库的项数受一个目录下最大文件数目限制。
+**FileKVDB锟斤拷锟斤拷**
+* 锟斤拷锟酵碉拷
+* 锟斤拷系锟酵碉拷
+* 锟斤拷效锟斤拷    
+锟斤拷锟捷匡拷锟斤拷锟斤拷锟斤拷锟斤拷一锟斤拷目录锟斤拷锟斤拷锟斤拷锟侥硷拷锟斤拷目锟斤拷锟狡★拷
 
-## javascript 调用接口
-### 基本使用 
+## javascript 锟斤拷锟矫接匡拷
+### 锟斤拷锟斤拷使锟斤拷 
 `kv=require('filekvdb');`  
 `kv.root('/kvdb')`  
 `kv.DB('myDB')`  
@@ -25,11 +26,11 @@
 `V=kv.get(K);`      
 `keys=kv.list();`    
 `kv.del(K);`   
-### 新建DB和表
+### 锟铰斤拷DB锟酵憋拷
 `kv.newDB('yourDB')`  
 `kv.DB('yourDB')`  
 `kv.newTable('yourTable')`  
-### 查询
+### 锟斤拷询
 `root = kv.root()`  
 `DB = kv.DB()`  
 `Tab = kv.Table()`  
@@ -38,7 +39,7 @@
 `kv.has(K, function(ret) { if(ret==true) do some if K exist })` 
 `kv.has(K) //if K exist return true`   
 `Tree = kv.Tree()`
-### 备份\恢复\清除
+### 锟斤拷锟斤拷\锟街革拷\锟斤拷锟斤拷
 `kv.backup({'DB':'myDB','Table':'myTable'})`  
 `kv.backup({'DB':'myDB'})`  
 `kv.restore({'DB':'myDB','Table':'myTable'})`  
@@ -47,8 +48,8 @@
 `kv.clearTable('table')`  
 `kv.clearTable('table','DB')`   
 
-## C++ 调用接口
-### 基本使用 
+## C++ 锟斤拷锟矫接匡拷
+### 锟斤拷锟斤拷使锟斤拷 
 `FileKVDB kv("kvdb");`  
 `kv.DB('myDB')`  
 `kv.Table('USER')`  
@@ -56,21 +57,21 @@
 `string V=kv.get(K);`      
 `vector<string> keys=kv.list();`    
 `kv.del(K);`
-### 新建DB和表
+### 锟铰斤拷DB锟酵憋拷
 `kv.newDB("yourDB")`  
 `kv.DB("yourDB")`  
 `kv.newTable("yourTable")`  
-### 查询
+### 锟斤拷询
 `DB = kv.DB()`  
 `Tab = kv.Table()`  
 `kv.hasDB("DB")`  
 `kv.hasTable("tabel")`  
 `kv.has(K)` 
-### 清除
+### 锟斤拷锟斤拷
 `kv.clearDB('DB')`  
 `kv.clearTable('table','DB')`   
 
-## C++  测试
+## C++  锟斤拷锟斤拷
 `mkdir work`  
 `make Test`  
 `mkdir kvdb`  
