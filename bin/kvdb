@@ -1,0 +1,97 @@
+#!/bin/sh
+
+lsV()
+{
+  lsdir=`ls $1`
+  for dir in $lsdir; do
+    db=${dir#$2}
+    echo "$db"
+  done 
+}
+
+local=`pwd`
+
+while getopts ":sgldnD:T:r:k:v:" opt; do
+  case "$opt" in
+  k)
+    key=$OPTARG
+    ;;
+  v)
+    value=$OPTARG
+    ;;
+  D)
+    DB=$OPTARG
+    [ -d "$ROOT/DB_$DB" ] && cd "$ROOT/DB_$DB"
+    ;;
+  T)
+    Table=$OPTARG
+    [ -d "T_$Table" ] && cd "T_$Table"
+    ;;
+  r)
+    ROOT=$local/$OPTARG
+    ;;
+  :)
+    break
+    ;;
+  g)
+    cat "K_$key"
+    break
+    ;;
+  s)
+    echo set "$value" to "K_$key"
+    echo "$value" > "K_$key"
+    break;
+    ;;
+  d)
+    if [ -n "$ROOT" ]; then
+      if [ -n "$DB" ]; then
+        if [ -n "$Table" ]; then
+          if [ -n "$key" ]; then
+            echo "rm $ROOT/DB_$DB/T_$Table/K_$key"
+            rm $ROOT/DB_$DB/T_$Table/K_$key
+          else
+            echo "rm $ROOT/DB_$DB/T_$Table"
+            rm -rf $ROOT/DB_$DB/T_$Table
+          fi
+        else
+          echo "rm $ROOT/DB_$DB"
+          rm -rf $ROOT/DB_$DB
+        fi
+      else
+        echo "rm $ROOT/*"
+        rm -rf $ROOT/*
+      fi
+    fi
+    break
+    ;;
+  l)
+    if [ -n "$ROOT" ]; then
+      if [ -n "$DB" ]; then
+        if [ -n "$Table" ]; then
+          lsV "." "K_"
+        else
+          lsV "." "T_"
+        fi
+      else
+        lsV "$ROOT" "DB_"
+      fi
+    fi        
+    break
+    ;;
+  n)
+    if [ -n "$ROOT" ]; then
+      if [ -n "$DB" ]; then
+        if [ -n "$Table" ]; then
+          echo "mkdir $ROOT/DB_$DB/T_$Table"
+          mkdir -p $ROOT/DB_$DB/T_$Table
+        else
+          echo "mkdir $ROOT/DB_$DB"
+          mkdir -p $ROOT/DB_$DB
+        fi
+      fi
+    fi        
+    break
+    ;;
+  esac
+done
+
